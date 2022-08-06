@@ -251,6 +251,8 @@ struct Shell_s
 	pid_t		current_ppid;	/* PPID of current ksh process (updates when subshell forks) */
 	unsigned char	sigruntime[2];
 	Namval_t	*bltin_nodes;
+	Namval_t	*bltin_aliases;
+	int		bltin_num_aliases;
 	Namval_t	*bltin_cmds;
 	History_t	*hist_ptr;
 	char		*shpath;

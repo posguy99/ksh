@@ -1627,9 +1627,10 @@ int sh_reinit(char *argv[])
 		if((dp = sh.alias_tree)->walk)
 			dp = dp->walk;
 		npnext = (Namval_t*)dtnext(sh.alias_tree,np);
-		nofree = nv_isattr(np,NV_NOFREE);			/* note: returns bitmask, not boolean */
-		_nv_unset(np,NV_RDONLY);				/* also clears NV_NOFREE attr, if any */
-		nv_delete(np,dp,nofree);
+		_nv_unset(np,NV_RDONLY|nv_isattr(np,NV_NOFREE));
+		dtdelete(sh.alias_tree,np);
+		if(!sh.bltin_aliases || np < sh.bltin_aliases || np > &sh.bltin_aliases[sh.bltin_num_aliases])
+			free(np);
 	}
 	/* Delete hash table entries */
 	for(np = dtfirst(sh.track_tree); np; np = npnext)
@@ -1965,6 +1966,11 @@ Dt_t *sh_inittree(const struct shtable2 *name_vals)
 	{
 		sh.bltin_nodes = np;
 		nvars = n;
+	}
+	else if(name_vals==shtab_aliases)
+	{
+		sh.bltin_aliases = np;
+		sh.bltin_num_aliases = n;
 	}
 	else if(name_vals==(const struct shtable2*)shtab_builtins)
 		sh.bltin_cmds = np;
